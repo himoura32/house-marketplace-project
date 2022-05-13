@@ -10,6 +10,7 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { ReactComponent as ArrowRightIcon } from '../assets/svg/keyboardArrowRightIcon.svg';
+import OAuth from '../components/OAuth';
 
 function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
@@ -112,7 +113,7 @@ function SignUp() {
           </div>
         </form>
 
-        {/* Google OAuth */}
+        <OAuth />
 
         <Link to='/sign-in' className='registerLink'>
           Sign In Instead
