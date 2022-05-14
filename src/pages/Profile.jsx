@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { getAuth, updateProfile } from 'firebase/auth';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { updateDoc, doc } from 'firebase/firestore';
 import { db } from '../firebase.config';
 import { toast } from 'react-toastify';
@@ -24,7 +24,7 @@ function Profile() {
 
   const onSubmit = async () => {
     try {
-      if(auth.currentUser.displayName !== name) {
+      if (auth.currentUser.displayName !== name) {
         // Update display name in fb
         await updateProfile(auth.currentUser, {
           displayName: name,
@@ -34,7 +34,7 @@ function Profile() {
         const userRef = doc(db, 'users', auth.currentUser.uid);
         await updateDoc(userRef, {
           name,
-        })
+        });
       }
     } catch (error) {
       console.log(error);
@@ -46,7 +46,7 @@ function Profile() {
     setFormData((prevState) => ({
       ...prevState,
       [e.target.id]: e.target.value,
-    }))
+    }));
   };
 
   return (
