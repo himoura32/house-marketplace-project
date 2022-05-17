@@ -5,9 +5,10 @@ import { db } from '../firebase.config';
 import { toast } from 'react-toastify';
 
 function Contact() {
+  // eslint-disable-next-line
+  const [searchParams, setSearchParams] = useSearchParams();
   const [message, setMessage] = useState('');
   const [landlord, setLandlord] = useState(null);
-  const [searchParams, setSearchParams] = useSearchParams();
 
   const params = useParams();
 

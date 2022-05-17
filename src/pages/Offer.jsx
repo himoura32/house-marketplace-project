@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import {
   collection,
   getDocs,
@@ -17,8 +16,7 @@ import ListingItem from '../components/ListingItem';
 function Offers() {
   const [listings, setListings] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  const params = useParams();
+  const [lastFetchedListing, setLastFetchedListing] = useState(null);
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -31,11 +29,15 @@ function Offers() {
           listingsRef,
           where('offer', '==', true),
           orderBy('timestamp', 'desc'),
-          limit(10)
+          limit(5)
         );
 
         // Execute query
         const querySnap = await getDocs(q);
+
+        const lastvisible = querySnap.docs[querySnap.docs.length - 1];
+
+        setLastFetchedListing(lastvisible);
 
         const listings = [];
 
@@ -55,12 +57,48 @@ function Offers() {
     fetchListing();
   }, []);
 
+  // Pagination / Load More
+  const onFetchMoreListings = async () => {
+    try {
+      // Get reference
+      const listingsRef = collection(db, 'listings');
+
+      // Create query
+      const q = query(
+        listingsRef,
+        where('offer', '==', true),
+        orderBy('timestamp', 'desc'),
+        startAfter(lastFetchedListing),
+        limit(5)
+      );
+
+      // Execute query
+      const querySnap = await getDocs(q);
+
+      const lastvisible = querySnap.docs[querySnap.docs.length - 1];
+
+      setLastFetchedListing(lastvisible);
+
+      const listings = [];
+
+      querySnap.forEach((doc) => {
+        return listings.push({
+          id: doc.id,
+          data: doc.data(),
+        });
+      });
+
+      setListings((prevState) => [...prevState, ...listings]);
+      setLoading(false);
+    } catch (error) {
+      toast.error('Could not fetch listings');
+    }
+  };
+
   return (
     <div className='category'>
       <header>
-        <p className='pageHeader'>
-          Offers
-        </p>
+        <p className='pageHeader'>Offers</p>
       </header>
 
       {loading ? (
@@ -78,6 +116,14 @@ function Offers() {
               ))}
             </ul>
           </main>
+
+          <br />
+          <br />
+          {lastFetchedListing && (
+            <p className='loadMore' onClick={onFetchMoreListings}>
+              Load More
+            </p>
+          )}
         </>
       ) : (
         <p>There are no current offers</p>
